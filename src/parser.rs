@@ -68,24 +68,63 @@ impl<'a> Parser<'a> {
 					// + = increment
 					// - = decrement
 					if value_str.starts_with(":") {
-						self.transpiler.store_exact(value)
+						self.transpiler.store_exact(value);
 					} else if value_str.starts_with("+") {
-						self.transpiler.store_add(value)
+						self.transpiler.store_add(value);
 					} else if value_str.starts_with("-") {
-						self.transpiler.store_sub(value)
+						self.transpiler.store_sub(value);
 					}
 				}
 			},
-			
+
+			// storec <char>
+			//  store an ascii character at current cell
+			"storec" => {
+				let mut char_str = tokens.get(1).ok_or("Missing character argument")?;
+
+				let c = match char_str.strip_suffix("!").unwrap_or(char_str) {
+					"<space>" => ' ',
+					_ => char_str.chars().next().ok_or("Invalid ASCII character")?
+				};
+
+				self.transpiler.store_char(c);
+			},
+
 			// put
 			//  print value in current cell
 			"put" => {
 				self.transpiler.put();
+			},
+
+			// putw <cells>/*
+			//  prints multiple cells at once
+			//
+			//  if the argument is a number it will print that many cells
+			//  if its a star it will print until next null byte
+			"putw" => {
+				let cells_str = tokens.get(1).ok_or("Missing cells argument")?;
+
+				if let Ok(cells) = cells_str.parse::<usize>() {
+					self.transpiler.put_multiple(cells);
+				} else if *cells_str == "*" {
+					self.transpiler.put_until_null();
+				}
+			}
+
+			// >
+			//  shortcut to increment pointer by 1
+			">" => {
+				self.transpiler.move_to(self.transpiler.pointer + 1);
 			}
 
 			_ => {
 				return Err("Unknown command")
 			},
+		}
+
+		// automatically increment ptr by 1 if line ends with !, synthetic sugar
+		if line.ends_with("!") {
+			self.transpiler.move_to(self.transpiler.pointer + 1);
 		}
 
 		Ok(())

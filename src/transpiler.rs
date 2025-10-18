@@ -39,12 +39,24 @@ impl Transpiler {
 		self.output.push_str(&"-".repeat(value));
 	}
 
+	pub fn store_char(&mut self, c: char) {
+		let ascii = c as u8 as usize;
+		self.store_exact(ascii);
+	}
+
 	// printing
 	pub fn put(&mut self) {
 		self.output.push_str(".");
 	}
-	
-	pub fn get_output(&mut self) -> String {
-		self.output.clone()
+
+	pub fn put_multiple(&mut self, n: usize) {
+		for _ in 0..n {
+			self.put();
+			self.move_to(self.pointer + 1);
+		}
+	}
+
+	pub fn put_until_null(&mut self) {
+		self.output.push_str("[.>]");
 	}
 }
