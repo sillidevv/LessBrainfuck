@@ -46,7 +46,7 @@ impl Transpiler {
 
 	// printing
 	pub fn put(&mut self) {
-		self.output.push_str(".");
+		self.output.push('.');
 	}
 
 	pub fn put_multiple(&mut self, n: usize) {

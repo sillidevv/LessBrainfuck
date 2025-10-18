@@ -80,7 +80,7 @@ impl<'a> Parser<'a> {
 			// storec <char>
 			//  store an ascii character at current cell
 			"storec" => {
-				let mut char_str = tokens.get(1).ok_or("Missing character argument")?;
+				let char_str = tokens.get(1).ok_or("Missing character argument")?;
 
 				let c = match char_str.strip_suffix("!").unwrap_or(char_str) {
 					"<space>" => ' ',

@@ -30,11 +30,11 @@ fn main() {
 
 	for (_line_num, line) in lines.iter().enumerate() {
 		{
-			match parser.parse_line(&line) {
+			match parser.parse_line(line) {
 				Ok(_) => {},
 
 				Err(err) => {
-					println!("{}", err)
+					println!("{err}")
 				},
 			}
 		}
