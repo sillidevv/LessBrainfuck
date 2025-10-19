@@ -23,12 +23,20 @@ impl Transpiler {
 			self.output.push_str(&"<".repeat(self.pointer - target));
 		}
 		self.pointer = target;
+		println!("{} ", self.pointer);
 	}
 
 	// storing
 	pub fn store_exact(&mut self, value: usize) {
 		self.output.push_str("[-]");
 		self.output.push_str(&"+".repeat(value));
+	}
+
+	pub fn store_vec(&mut self, v: Vec<u8>) {
+		for byte in v {
+			self.store_exact(byte as usize);
+			self.move_to(self.pointer + 1);
+		}
 	}
 
 	pub fn store_add(&mut self, value: usize) {
@@ -59,4 +67,6 @@ impl Transpiler {
 	pub fn put_until_null(&mut self) {
 		self.output.push_str("[.>]");
 	}
+
+	// reading
 }
