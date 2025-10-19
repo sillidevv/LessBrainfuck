@@ -1,4 +1,4 @@
-use std::io;
+use std::{io, process};
 use std::fs::File;
 use std::io::{BufRead, Write};
 use std::path::Path;
@@ -6,6 +6,7 @@ use std::time::Instant;
 use crate::parser::Parser;
 use crate::transpiler::Transpiler;
 
+// modules
 mod transpiler;
 mod parser;
 
@@ -44,13 +45,14 @@ fn main() {
 	// timer
 	let start = Instant::now();
 
-	for (_line_num, line) in lines.iter().enumerate() {
+	for (line_num, line) in lines.iter().enumerate() {
 		{
 			match parser.parse_line(&line) {
 				Ok(_) => {},
 
 				Err(err) => {
-					println!("{err}")
+					println!("Error at line {}: {err}", line_num + 1);
+					process::exit(1);
 				},
 			}
 		}
