@@ -69,4 +69,14 @@ impl Transpiler {
 	}
 
 	// reading
+	pub fn read(&mut self) {
+		self.output.push(',');
+	}
+
+	pub fn read_multiple(&mut self, n: usize) {
+		for _ in 0..n {
+			self.read();
+			self.move_to(self.pointer + 1);
+		}
+	}
 }

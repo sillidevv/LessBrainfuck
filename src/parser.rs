@@ -51,7 +51,7 @@ impl<'a> Parser<'a> {
 						self.transpiler.move_to(self.transpiler.pointer - cell);
 					}
 				}
-			}
+			},
 
 			// store :/+/-<value>
 			//  store value at current cell
@@ -91,6 +91,9 @@ impl<'a> Parser<'a> {
 				self.transpiler.store_char(c);
 			},
 
+
+			// storestr "<text>"
+			//  stores a string byte by byte
 			"storestr" => {
 				let string = tokens.get(1).ok_or("Missing character argument")?;
 				let chars = string.strip_suffix("!").unwrap_or(string).bytes().collect();
@@ -117,12 +120,24 @@ impl<'a> Parser<'a> {
 				} else if *cells_str == "*" {
 					self.transpiler.put_until_null();
 				}
-			}
+			},
 
 			// >
 			//  shortcut to increment pointer by 1
 			">" => {
 				self.transpiler.move_to(self.transpiler.pointer + 1);
+			},
+
+			"read" => {
+				self.transpiler.read();
+			},
+
+			"readw" => {
+				let length_str = tokens.get(1).ok_or("Missing length argument")?;
+				
+				if let Ok(length) = length_str.parse::<usize>() {
+					self.transpiler.read_multiple(length);
+				}
 			}
 
 			_ => {
