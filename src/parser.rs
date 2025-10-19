@@ -11,12 +11,12 @@ impl<'a> Parser<'a> {
 		}
 	}
 
-	pub fn parse_line(&mut self, line: &str) -> Result<(), &str> {
+	pub fn parse_line(&mut self, line: &String) -> Result<(), &str> {
 		let trimmed = line.trim();
 
 		// if line empty
 		if trimmed.is_empty() {
-			return Err("Line empty")
+			return Ok(())
 		}
 
 		// tokens are just the line split by wh
