@@ -23,7 +23,6 @@ impl Transpiler {
 			self.output.push_str(&"<".repeat(self.pointer - target));
 		}
 		self.pointer = target;
-		println!("{} ", self.pointer);
 	}
 
 	// storing
@@ -78,5 +77,14 @@ impl Transpiler {
 			self.read();
 			self.move_to(self.pointer + 1);
 		}
+	}
+
+	// loops
+	pub fn start_loop(&mut self) {
+		self.output.push('[');
+	}
+
+	pub fn end_loop(&mut self) {
+		self.output.push(']');
 	}
 }

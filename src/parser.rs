@@ -21,8 +21,6 @@ impl<'a> Parser<'a> {
 
 		// tokens are just the line split by whitespace cause im lazy
 		let tokens: Vec<&str> = split_tokens(line).ok_or("Couldnt split line into tokens")?;
-		
-		println!("{tokens:?}");
 
 		// command is the first token
 		let command = tokens.first().ok_or("No command bruh??")?;
@@ -138,6 +136,14 @@ impl<'a> Parser<'a> {
 				if let Ok(length) = length_str.parse::<usize>() {
 					self.transpiler.read_multiple(length);
 				}
+			},
+
+			"loop" => {
+				self.transpiler.start_loop();
+			}
+
+			"end" => {
+				self.transpiler.end_loop();
 			}
 
 			_ => {
