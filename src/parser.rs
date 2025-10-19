@@ -19,9 +19,12 @@ impl<'a> Parser<'a> {
 			return Ok(())
 		}
 
-		// tokens are just the line split by wh
-		let tokens: Vec<&str> = line.split_whitespace().collect();
+		// tokens are just the line split by whitespace cause im lazy
+		let tokens: Vec<&str> = split_tokens(line).ok_or("Couldnt split line into tokens")?;
+		
+		println!("{tokens:?}");
 
+		// command is the first token
 		let command = tokens.first().ok_or("No command bruh??")?;
 
 		match *command {
@@ -34,7 +37,6 @@ impl<'a> Parser<'a> {
 			//  - = decrement pointer
 			"move" => {
 				let cell_str = tokens.get(1).ok_or("Missing argument (cell to move to)")?;
-
 				let no_prefix = try_remove_num_prefix(cell_str).ok_or("Invalid number prefix")?;
 
 				if let Ok(cell) = no_prefix.parse::<usize>() {
@@ -60,7 +62,6 @@ impl<'a> Parser<'a> {
 			//  - = decrement value
 			"store" => {
 				let value_str = tokens.get(1).ok_or("Missing value argument")?;
-
 				let no_prefix = try_remove_num_prefix(value_str).ok_or("Invalid number prefix")?;
 
 				if let Ok(value) = no_prefix.parse::<usize>() {
@@ -88,6 +89,13 @@ impl<'a> Parser<'a> {
 				};
 
 				self.transpiler.store_char(c);
+			},
+
+			"storestr" => {
+				let string = tokens.get(1).ok_or("Missing character argument")?;
+				let chars = string.strip_suffix("!").unwrap_or(string).bytes().collect();
+
+				self.transpiler.store_vec(chars);
 			},
 
 			// put
@@ -145,4 +153,55 @@ fn try_remove_num_prefix(num: &str) -> Option<&str> {
 	};
 
 	Some(no_prefix)
+}
+
+// splits a line into tokens supporting strings with ""
+fn split_tokens(line: &str) -> Option<Vec<&str>> {
+	if line.trim().is_empty() {
+		return None;
+	}
+
+	let mut tokens = Vec::new();
+	
+	let mut in_quotes = false;
+	let mut start = 0;
+	let mut i = 0;
+	
+	let chars: Vec<char> = line.chars().collect();
+
+	while i < chars.len() {
+		match chars[i] {
+			'"' => {
+				if in_quotes {
+					// end of quoted token
+					tokens.push(&line[start..i]);
+					in_quotes = false;
+					start = i + 1;
+				} else {
+					// start of quoted token
+					in_quotes = true;
+					start = i + 1;
+				}
+			}
+			c if c.is_whitespace() && !in_quotes => {
+				if start != i {
+					tokens.push(&line[start..i]);
+				}
+				start = i + 1;
+			}
+			_ => {}
+		}
+		i += 1;
+	}
+
+	// push last token only if not in quotes and not empty
+	if !in_quotes && start < line.len() {
+		tokens.push(&line[start..]);
+	}
+
+	if tokens.is_empty() {
+		None
+	} else {
+		Some(tokens)
+	}
 }
