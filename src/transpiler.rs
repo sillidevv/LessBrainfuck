@@ -1,8 +1,11 @@
 use std::collections::HashMap;
 
+// too lazy to document this :3
+
 pub struct Transpiler {
 	pub pointer: usize,
 	cell_names: HashMap<String, String>,
+	modified: [bool; 30_000],
 	pub output: String,
 }
 
@@ -11,6 +14,7 @@ impl Transpiler {
 		Self {
 			pointer: 0,
 			cell_names: HashMap::new(),
+			modified: [false; 30_000],
 			output: String::new(),
 		}
 	}
@@ -27,7 +31,12 @@ impl Transpiler {
 
 	// storing
 	pub fn store_exact(&mut self, value: usize) {
-		self.output.push_str("[-]");
+		if self.modified[self.pointer] {
+			self.output.push_str("[-]");
+		} else {
+			self.modified[self.pointer] = true;
+		}
+
 		self.output.push_str(&"+".repeat(value));
 	}
 
